@@ -96,7 +96,7 @@ In this part, we are gonna explore the data to answer key questions :
 
 
 
-### 1. What is the average rating for each genre ?
+#### 1. What is the average rating for each genre ?
 
 ```
 SELECT Genre, AVG(Rating) AS AVGRate
@@ -105,9 +105,14 @@ GROUP BY Genre
 ORDER BY 2 DESC
 ```
 
+|Genre|AvgRate|
+|-----|-------|
+|Animation, Drama, War|8,5|
+|Action, Sci-Fi|8,4|
+|Drama, Musical|8,4|
 
 
-### 2. What Director has the best Ratings  ?
+#### 2. What Director has the best Ratings  ?
 
 ```
 SELECT IMBD.Director, AVG(Rating) as AvgRating
@@ -116,20 +121,32 @@ GROUP BY IMBD.Director
 ORDER BY 2 DESC
 ```
 
+|Director|AvgRating|
+|--------|---------|
+|Frank Darabont|8,95|
+|Irvin Kershner|8,7|
+|Lana Wachowski|8,7|
+|George Lucas|8,6|
 
 
-### 3. What genre brings the most revenue ?
+
+#### 3. What genre brings the most revenue ?
 
 ```
-SELECT IMDB.Genre, AVG(Gross)
+SELECT IMDB.Genre, AVG(Gross) AS AvgGross
 FROM #IMDb_top_1000 AS IMDB 
 GROUP BY IMDB.Genre
 ORDER BY 2 DESC
 ```
 
+|Genre|AvgGross|
+|--------|---------|
+|Family, Sci-Fi|435 110 554|
+|Action, Adventure, Fantasy|352 723 505,16|
+|Action, Adventure, Family|301 959 197|
 
 
-### 4. Most popular genre over the years ?
+#### 4. Most popular genre over the years ?
 
 ```
 WITH FindMax AS (
@@ -149,33 +166,9 @@ ON fmax.Year = FindGenre.Year AND fmax.SumVotes = FindGenre.MaxVotes
 
 
 
-### 4. Bonus : with the title 
+#### 5. Nombre de film ayant un gross supérieur à 100m au fil des années 
 
 ```
-WITH FindMax AS (
-	SELECT Year, Genre, Title, Sum(No_of_Votes) AS SumVotes
-	FROM #IMDb_top_1000
-	GROUP BY Year, Genre, Title
-),
-FindGenre AS (
-	SELECT YEAR, Max(SumVotes) AS MaxVotes
-	FROM FindMax
-	Group by Year
-)
-SELECT fmax.Year, fmax.SumVotes, fmax.Genre, fmax.Title
-FROM FindMax AS fmax
-JOIN FindGenre
-ON fmax.Year = FindGenre.Year AND fmax.SumVotes = FindGenre.MaxVotes
-```
-
-
-
-### 5. Evolution gross au fil des années ?
-
-```
-SELECT AVG(Gross)
-FROM #IMDb_top_1000
-
 SELECT COUNT(*) 
 FROM (
 	SELECT Year, Gross
@@ -200,74 +193,141 @@ FROM (
 ) AS Comp3
 ```
 
+Sachant que l'on sait que le budget pour la production d'un film augmente de plus en plus au fil des années, on remarque qu'il y a de plus en plus de films avec un gross supérieur à 100m. L'augmentation du budget n'est donc pas inutile au contraire.   
 
 
-### 6. Notes des films au fil des années ?
+#### 6. Notes des films au fil des années ?
 
 ```
-SELECT COUNT(*) 
-FROM (
-	SELECT Year, Rating 
-	FROM #IMDb_top_1000
-	WHERE Rating > 7.0 AND Year BETWEEN '2000' and '2020'
-) AS Comp1
-
-SELECT COUNT(*) 
-FROM (
-	SELECT Year, Rating 
-	FROM #IMDb_top_1000
-	WHERE Rating > 7.0 AND Year BETWEEN '1980' and '2000'
-) AS Comp2
-
-SELECT COUNT(*) 
-FROM (
-	SELECT Year, Rating 
-	FROM #IMDb_top_1000
-	WHERE Rating > 7.0 AND Year BETWEEN '1960' and '1980'
-) AS Comp3
+SELECT AVG(Rating)
+FROM #IMDb_top_1000
+WHERE Year between '2000' and '2020'
 ```
 
-#### Les nouveaux films sont-ils vraiment meilleurs que les anciens ? 
+7,91
+
+```
+SELECT AVG(Rating)
+FROM #IMDb_top_1000
+WHERE Year between '1980' and '2000'
+```
+
+7,96	
+
+```
+SELECT AVG(Rating)
+FROM #IMDb_top_1000
+WHERE Year between '1960' and '1980'
+```
+
+7,98
+
+#### Attention
+
+D'après la question précédente, la note moyenne des films n'a pas tellement évolué au fil des années. Néanmoins, un critère est à prendre en compte, le nombre de votes : 
 
 ```
 SELECT Sum(No_of_Votes)
 FROM #IMDb_top_1000
 WHERE Year between '2000' and '2020'
+```
 
+158 884 033
+
+```
 SELECT Sum(No_of_Votes)
 FROM #IMDb_top_1000
 WHERE Year between '1980' and '2000'
+```
 
+82 582 142
+
+```
 SELECT Sum(No_of_Votes)
 FROM #IMDb_top_1000
 WHERE Year between '1960' and '1980'
 ```
 
+27 816 959
+
+Il y a beaucoup plus de votes pour les films récents qu'anciens, il y en a 10 fois plus pour les films sortis entre 2000 et 2020, qu'entre 1960 et 1980. Ainsi sachant qu'il est plus difficile d'avoir une bonne note lorsque le nombre de votes est plus faible, on pourrait penser qu'il y a plus de bons films à l'époque que maintenant. Toutefois ce constat est à prendre avec des pincettes, d'autres facteurs doivent également être pris en compte. 
 
 
-### 7. Durée des films au fil des années ?
+
+#### 7. Durée des films au fil des années ?
+
+Nous devons tout d'abord enlever la partie 'min' dans la colonne Runtime puis convertir les données en int. 
 
 ```
 UPDATE #IMDb_top_1000
 SET Runtime = REPLACE(Runtime, 'min', '')
 WHERE Runtime LIKE '%min%'
 
-SELECT * FROM #IMDb_top_1000
-
 SELECT AVG(convert(int,Runtime)) as AvgTime1
 FROM #IMDb_top_1000
 WHERE Year BETWEEN '2000' and '2020'
+```
 
+125
+
+```
 SELECT AVG(convert(int,Runtime)) as AvgTime2
 FROM #IMDb_top_1000
 WHERE Year BETWEEN '1980' and '2000'
+```
 
+122
+
+```
 SELECT AVG(convert(int,Runtime)) as AvgTime3
 FROM #IMDb_top_1000
 WHERE Year BETWEEN '1960' and '1980'
 ```
 
+124
 
+La durée moyenne d'un film n'a donc pas évoluer au fil des années.
+
+
+### Limitation 
+
+Pour la totalité de nos analyses nous avons utiliser la fonction moyenne (AVG), plutôt que la médianne puisqu'il n'existe pas de fonction prédéfini alors que cette dernière est plus pertinente. On peut donc vérifier si les données sont assez homogènes, et ainsi utiliser la moyenne (pour ne pas avoir des trucs abbérants). Pour cela, regardons pour chaque colonne, le nombre de d'éléments inférieur à la moyenne. Sacahnt qu'il y a 1000 valeurs pour chaque colonne, si il y environ 500 valeur en dessous de la moyenne alors la fonction moyenne est pertinente pour cette colonne. 
+
+```
+SELECT COUNT(*)
+FROM #IMDb_top_1000
+WHERE (convert(int,Runtime)) < (SELECT AVG(convert(int,Runtime)) FROM #IMDb_top_1000)
+```
+
+538
+
+```
+SELECT COUNT(*)
+FROM #IMDb_top_1000
+WHERE Gross < (SELECT AVG(Gross) FROM #IMDb_top_1000)
+```
+
+568
+
+```
+SELECT COUNT(*)
+FROM #IMDb_top_1000
+WHERE No_of_Votes < (SELECT AVG(No_of_Votes) FROM #IMDb_top_1000)
+```
+
+669
+
+```
+SELECT COUNT(*)
+FROM #IMDb_top_1000
+WHERE Rating < (SELECT AVG(Rating) FROM #IMDb_top_1000)
+```
+
+537
+
+CCL :
+
+### Résultats / conclusion 
 
 
  
