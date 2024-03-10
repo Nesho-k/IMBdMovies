@@ -7,7 +7,6 @@
 - [Tools](#tools)
 - [Data Cleaning part.1](#data-cleaning-part-1)
 - [Data Cleaning part.2](#data-cleaning-part-2)
-- [Missing Data](#missing-data)
 - [Data Exploration](#data-exploration)
 - [Limitations](#Limitations)
 - [Results](#Results)
