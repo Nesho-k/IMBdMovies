@@ -1,5 +1,13 @@
 # IMBd Movies Analysis
 
+## Table of contents 
+
+- [Project Overview](#project-overview)
+- [Data Source](#data-source)
+- [Tools](#tools)
+- [Data Cleaning part.1](#data-cleaning-part-1)
+- [Data Cleaning part.2](#data-cleaning-part-2)
+
 ### Project Overview
 
 This data analysis project aims to provide insights into the performance of movies with their ratings over the years. By analyzing various aspects of the movies data, we seek to identify trends and make data-driven recommendations for futur movies dorectors and help them in their decisions.
@@ -13,7 +21,7 @@ Movies Data: The primary dataset used for this analysis is the "imdb_top_1000.cs
 - Excel : Data Cleaning
 - SQL : Data Cleaning, Data Exploration and Data Analysis
 
-### Data Cleaning part. 1 
+### Data Cleaning part.1 
 
 In the initial data preparation phase that we did in excel, we performed the following tasks:
 
@@ -21,7 +29,7 @@ In the initial data preparation phase that we did in excel, we performed the fol
 2. Handling missing values.
 3. Data cleaning and formatting
 
-### Data Cleaning part. 2
+### Data Cleaning part.2
 
 Unfortunately, we had some problems when we import the dataset from Excel to SQL, so we had to clean it again on SQL. First, we took columns that are going to be the most interesting which are Title, Released Year, Runtime, Genre, Director, Star 1, Star 2, Star 3, Star 4, No of Votes and Gross, in that respect we are going to create a temp table :
 
@@ -291,8 +299,7 @@ La durée moyenne d'un film n'a donc pas évoluer au fil des années.
 
 ### Limitation 
 
-Pour la totalité de nos analyses nous avons utiliser la fonction moyenne (AVG), plutôt que la médianne puisqu'il n'existe pas de fonction prédéfini alors que cette dernière est plus pertinente. On peut donc vérifier si les données sont assez homogènes, et ainsi utiliser la moyenne (pour ne pas avoir des trucs abbérants). Pour cela, regardons pour chaque colonne, le nombre de d'éléments inférieur à la moyenne. Sacahnt qu'il y a 1000 valeurs pour chaque colonne, si il y environ 500 valeur en dessous de la moyenne alors la fonction moyenne est pertinente pour cette colonne. 
-
+Pour toute nos analyses nous avons utiliser la fonction moyenne (AVG), plutôt que la médianne puisqu'il n'existe pas de fonction prédéfini alors que cette dernière est plus pertinente. On peut donc vérifier si les données sont assez homogènes, pour voir si la moyenne est une fonction approprié. Pour cela, regardons pour chaque colonne, le nombre de d'éléments inférieur à la moyenne. Sacahnt qu'il y a 1000 valeurs pour chaque colonne, si il y environ 500 valeur en dessous de la moyenne est convenable.
 ```
 SELECT COUNT(*)
 FROM #IMDb_top_1000
@@ -325,9 +332,15 @@ WHERE Rating < (SELECT AVG(Rating) FROM #IMDb_top_1000)
 
 537
 
-CCL :
+Ainsi, mis à part pour le nombre de votes, la moyenne est une fonction pertinente.
 
-### Résultats / conclusion 
+### Résultats 
+
+Based on the analysis, we recommend the following actions:
+
+- Un film dont la durée est d'envirion 2h
+- Le genre Action, Sci-Fi
+- Réalisé par George Lucas, Frank Darabont, Irvin Kershner ou Lana Wachowski
 
 
  
