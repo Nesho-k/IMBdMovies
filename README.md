@@ -7,14 +7,18 @@
 - [Tools](#tools)
 - [Data Cleaning part.1](#data-cleaning-part-1)
 - [Data Cleaning part.2](#data-cleaning-part-2)
+- [Missing Data](#missing-data)
+- [Data Exploration](#data-exploration)
+- [Limitations](#Limitations)
+- [Results](#Results)
 
 ### Project Overview
 
-This data analysis project aims to provide insights into the performance of movies with their ratings over the years. By analyzing various aspects of the movies data, we seek to identify trends and make data-driven recommendations for futur movies dorectors and help them in their decisions.
+This data analysis project aims to provide insights into the performance of movies over the years. By analyzing various aspects of the movie data, we seek to identify trends and make data-driven recommendations for future movie directors to help them in their decisions
 
 ### Data Source 
 
-Movies Data: The primary dataset used for this analysis is the "imdb_top_1000.csv" file, containing detailed information about movies Poster Link's, Title's, Released Year's, Certificate's, Runtime's, Genre's, IMDB Rating's, Overview's, Meta score's, Director's, Star1's, Star2's, Star3's, Star4's, No_of_votes's, Gross's 
+Movies Data : The primary dataset used for this analysis is the 'imdb_top_1000.csv' file, containing detailed information about movie posters, titles, release years, certificates, runtimes, genres, IMDB ratings, overviews, Metascores, directors, stars, number of votes, and gross.
 
 ### Tools 
 
@@ -68,7 +72,7 @@ WHERE Gross is null
 
 ```
 
-There is about 197 missing values out of 1000. We are gonna go further, pour voir à qquelle période ils manquent le plus de données :
+There is about 197 missing values out of 1000. We will go further to see during which period there is the most missing data.
 
 ```
 SELECT COUNT(*)
@@ -88,7 +92,7 @@ FROM #IMDb_top_1000
 WHERE Year between '1960' and '1980'
 ```
 
-There is 61 missing values out of 126 which is a lot. Contre 46 pour 157.  So, pour le reste du projet on va principalement s'intéresser aux films sortis après 1960 (l'année 1960a été choisi au hasard), car avant cela il y a trop de données manquantes. 
+There is 61 missing values out of 126 which is a lot against 46 out of 157.  So, for the rest of the project, we will primarily focus on films released after 1960 (the year 1960 was chosen randomly), as there are too many missing data before that
 
 
 ### Data Expolration 
@@ -97,10 +101,10 @@ In this part, we are gonna explore the data to answer key questions :
   1. What is the average rating for each genre ?
   2. What Director has the best Ratings ?
   3. What genre brings the most revenue ?
-  4. Most popular genre over the years ?
-  5. Evolution gross au fil des années ?
-  6. Notes des films au fil des années ?
-  7. Durée des films au fil des années ?
+  4. Number of films with gross revenue exceeding 100m over the years ?
+  5. Evolution of gross over the years ?
+  6. Film Ratings over the years ?
+  7. Film Runtimes over the years?
 
 
 
@@ -174,8 +178,7 @@ ON fmax.Year = FindGenre.Year AND fmax.SumVotes = FindGenre.MaxVotes
 
 
 
-#### 5. Nombre de film ayant un gross supérieur à 100m au fil des années 
-
+#### 5. Number of films with gross revenue exceeding 100m over the years
 ```
 SELECT COUNT(*) 
 FROM (
@@ -201,10 +204,12 @@ FROM (
 ) AS Comp3
 ```
 
-Sachant que l'on sait que le budget pour la production d'un film augmente de plus en plus au fil des années, on remarque qu'il y a de plus en plus de films avec un gross supérieur à 100m. L'augmentation du budget n'est donc pas inutile au contraire.   
+
+Given that we know the budget for film production is increasing over the years, we observe that there are more and more films with a gross revenue exceeding 100m. The increase in budget is therefore not useless; on the contrary, it seems to be beneficial. 
 
 
-#### 6. Notes des films au fil des années ?
+#### 6. Film Ratings over the years ?
+
 
 ```
 SELECT AVG(Rating)
@@ -232,7 +237,7 @@ WHERE Year between '1960' and '1980'
 
 #### Attention
 
-D'après la question précédente, la note moyenne des films n'a pas tellement évolué au fil des années. Néanmoins, un critère est à prendre en compte, le nombre de votes : 
+Based on the previous question, the average rating of films hasn't changed much over the years. However, a criteria should be consider : the number of votes
 
 ```
 SELECT Sum(No_of_Votes)
@@ -258,13 +263,13 @@ WHERE Year between '1960' and '1980'
 
 27 816 959
 
-Il y a beaucoup plus de votes pour les films récents qu'anciens, il y en a 10 fois plus pour les films sortis entre 2000 et 2020, qu'entre 1960 et 1980. Ainsi sachant qu'il est plus difficile d'avoir une bonne note lorsque le nombre de votes est plus faible, on pourrait penser qu'il y a plus de bons films à l'époque que maintenant. Toutefois ce constat est à prendre avec des pincettes, d'autres facteurs doivent également être pris en compte. 
+There are significantly more votes for recent films than for older ones; there are 10 times more votes for films released between 2000 and 2020 than between 1960 and 1980. In that respect, a large number of votes can often lead to a more accurate evaluation of the quality of a film, making the ratings of recent films more precise.
 
 
 
-#### 7. Durée des films au fil des années ?
+#### 7. Film Runtimes over the years?
 
-Nous devons tout d'abord enlever la partie 'min' dans la colonne Runtime puis convertir les données en int. 
+We first need to remove the 'min' part from the Runtime column and then convert the data to integers.
 
 ```
 UPDATE #IMDb_top_1000
@@ -294,12 +299,14 @@ WHERE Year BETWEEN '1960' and '1980'
 
 124
 
-La durée moyenne d'un film n'a donc pas évoluer au fil des années.
+The average duration of a film has not changed over the years.
 
 
-### Limitation 
 
-Pour toute nos analyses nous avons utiliser la fonction moyenne (AVG), plutôt que la médianne puisqu'il n'existe pas de fonction prédéfini alors que cette dernière est plus pertinente. On peut donc vérifier si les données sont assez homogènes, pour voir si la moyenne est une fonction approprié. Pour cela, regardons pour chaque colonne, le nombre de d'éléments inférieur à la moyenne. Sacahnt qu'il y a 1000 valeurs pour chaque colonne, si il y environ 500 valeur en dessous de la moyenne est convenable.
+### Limitations 
+
+For all our analyses, we have used the average function (AVG) rather than the median, since there is no predefined function, even though the median is more appropriate. We can therefore verify if the data is homogeneous to see if the mean is an appropriate function. To do this, let's look at each column and count the number of elements below the mean. Knowing that there are 1000 values for each column, if there are approximately 500 values below the mean, then it is suitable.
+
 ```
 SELECT COUNT(*)
 FROM #IMDb_top_1000
@@ -332,15 +339,17 @@ WHERE Rating < (SELECT AVG(Rating) FROM #IMDb_top_1000)
 
 537
 
-Ainsi, mis à part pour le nombre de votes, la moyenne est une fonction pertinente.
+Thus, except for the number of votes, the mean is an appropriate function.
 
-### Résultats 
+
+
+### Results 
 
 Based on the analysis, we recommend the following actions:
 
-- Un film dont la durée est d'envirion 2h
-- Le genre Action, Sci-Fi
-- Réalisé par George Lucas, Frank Darabont, Irvin Kershner ou Lana Wachowski
+- A movie with a duration of about 2 hours
+- The genre Action, Sci-Fi
+- Directed by George Lucas, Frank Darabont, Irvin Kershner, or Lana Wachowski
 
 
  
